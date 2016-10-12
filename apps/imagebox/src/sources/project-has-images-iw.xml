@@ -26,9 +26,6 @@
           <element type="PhotoElement" elType="background" x="0" y="0" width="12236.220472440944"
                    height="4913.385826771653" px="0" py="0" pw="1" ph="1" rot="0" dep="0" imageid="279827" imgRot="0"
                    imgFlip="false" cropLUX="0" cropLUY="0.19827454573217287" cropRLX="1" cropRLY="0.8017254542678272"/>
-          <element type="PhotoElement" elType="background" x="100" y="100" width="5586.614173228347" targetWidth="600" targetHeight="400"
-                   height="4346.456692913386" px="0" py="0" pw="1" ph="1" rot="0" dep="0" imageid="279826" imgRot="0"
-                   imgFlip="false" cropLUX="0.07134375" cropLUY="0" cropRLX="0.9286562500000001" cropRLY="1"/>
         </elements>
       </spread>
       <spread id="UNIQUE-1" type="innerPage" w="4051.1811023622045" h="3106.299212598425" bleedTop="35.43307086614173"

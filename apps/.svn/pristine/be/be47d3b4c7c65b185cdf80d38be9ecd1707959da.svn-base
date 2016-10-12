@@ -1,7 +1,0 @@
-locale: "en"
-
-WorkSpace:
-  ADD_TEXT: "Add Text"
-  OUTSIDE: "Outside"
-  INSIDE: "Inside"
-  COUNT: "{{n}} item"

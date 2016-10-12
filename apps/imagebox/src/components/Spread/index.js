@@ -154,7 +154,7 @@ class Spread extends Component {
   }
 
   getPhotoElementHtml() {
-    const { spreadId, spreadOptions, ratio } = this.props;
+    const { spreadId, spreadOptions, ratio, toggleOperationPanel } = this.props;
     const { width, height } = spreadOptions;
 
     const elements = this.state.photoElements.map((p, i) => {
@@ -163,6 +163,7 @@ class Spread extends Component {
                        width={p.targetWidth || width}
                        height={p.targetHeight || height}
                        ratio={ratio}
+                       onClicked={toggleOperationPanel}
                        options={p}>
         </XPhotoElement>
       );
@@ -222,13 +223,16 @@ class Spread extends Component {
   }
 
   handleBgClick(event) {
+    // 标记, 图片上传完成后, 自动添加到canvas中.
+    const { editText, boundWorkspaceActions, spreadId, spreadOptions } = this.props;
+    boundWorkspaceActions.autoAddPhotoToCanvas(true, spreadId, spreadOptions.width, spreadOptions.height);
+
     this.setState({
       autoOpen: true
     });
   }
 
   handleTextDblClick(options) {
-    const { editText } = this.props;
     editText(options);
   }
 

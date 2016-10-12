@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
-import { CHANGE_WORKSPACE_SPREAD } from '../contants/actionTypes';
+import { merge } from 'lodash';
+import { CHANGE_WORKSPACE_SPREAD, AUTO_ADD_PHOTO_TO_CANVAS, TOGGLE_OPERATION_PNAEL } from '../contants/actionTypes';
 
 const currentSpread = (state = {}, action) => {
   switch (action.type) {
@@ -12,6 +13,38 @@ const currentSpread = (state = {}, action) => {
   }
 };
 
+const autoAddPhotoToCanvas = (state = { status: false }, action) => {
+  switch (action.type) {
+    case AUTO_ADD_PHOTO_TO_CANVAS: {
+      const { status, spreadId, targetWidth, targetHeight } = action;
+      return merge({}, state, {
+        status,
+        spreadId,
+        targetWidth,
+        targetHeight
+      });
+    }
+    default:
+      return state;
+  }
+};
+
+const operationPanel = (state = { status: false, offset: { top: 150, left: 500 } }, action) => {
+  switch (action.type) {
+    case TOGGLE_OPERATION_PNAEL: {
+      const { status, offset } = action;
+      return merge({}, state, {
+        status,
+        offset
+      });
+    }
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
-  currentSpread
+  currentSpread,
+  autoAddPhotoToCanvas,
+  operationPanel
 });

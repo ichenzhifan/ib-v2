@@ -193,6 +193,7 @@ class App extends Component {
       loadingData,
       imageEditModalData,
       currentSpread,
+      operationPanel,
       baseUrls,
 
       ratio
@@ -255,9 +256,11 @@ class App extends Component {
             baseUrls={baseUrls}
             loadingData={loadingData}
             imageArray={imageArray}
+            operationPanel={operationPanel}
             boundUploadedImagesActions={boundUploadedImagesActions}
             addText={this.addText.bind(this)}
             editText={this.editText.bind(this)}
+            toggleModal={this.toggleModal.bind(this)}
             ratio={ratio}
           >
             {/* 显示弹窗 */}
@@ -351,6 +354,9 @@ const mapStateToProps = state => ({
 
   // 当前workspace上活动的spread.
   currentSpread: get(state, 'system.workspace.currentSpread'),
+
+  // 显示或隐藏workspace上的操作面板.
+  operationPanel: get(state, 'system.workspace.operationPanel'),
 
   uploadingImages: state.system.images.uploading,
   price: state.system.price,

@@ -35,6 +35,7 @@ export class Element {
 
       // 图片的id
       imageid = '',
+      encImgId = '',
 
       // 元素的旋转角度
       rot = 0,
@@ -86,6 +87,7 @@ export class Element {
 
     // 图片的id
     this.imageid = imageid;
+    this.encImgId = encImgId;
 
     // 图片的旋转角度.
     this.rot = rot;

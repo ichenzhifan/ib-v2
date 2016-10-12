@@ -20,10 +20,8 @@ export default class XPopover extends Component {
     this.onHideHandle = this.onHide.bind(this);
 
     // 如果为显示状态, 就加上隐藏面板的事件监听
-    if (shown) {
-      document.addEventListener('click', this.onHideHandle, false);
-      window.addEventListener('resize', this.onHideHandle, false);
-    }
+    document.addEventListener('click', this.onHideHandle, false);
+    window.addEventListener('resize', this.onHideHandle, false);
   }
 
   componentWillReceiveProps(nextProps) {

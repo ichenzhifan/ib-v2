@@ -1,7 +1,0 @@
-// web  client id
-export const webClientId = 1;
-
-// 左侧栏的宽度
-export const sideBarWidth = 382;
-
-export const workSpacePrecent = 0.8;

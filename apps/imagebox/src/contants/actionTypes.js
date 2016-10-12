@@ -147,3 +147,9 @@ export const UPDATE_TEXT_POSITION = 'UPDATE_TEXT_POSITION';
 // --------------------- workspace actions ------------------------------
 // action 类型: 更改workspace中的spread
 export const CHANGE_WORKSPACE_SPREAD = 'CHANGE_WORKSPACE_SPREAD';
+
+// action 类型: 是否自动添加当前上传的图片到canvas.
+export const AUTO_ADD_PHOTO_TO_CANVAS = 'AUTO_ADD_PHOTO_TO_CANVAS';
+
+// action 类型: 显示或隐藏workspace上的操作面板.
+export const TOGGLE_OPERATION_PNAEL = 'TOGGLE_OPERATION_PNAEL';

@@ -1,4 +1,0 @@
-export default {
-  API_BASE: '',
-  GET_TODO_LIST: '../../imagebox/src/sources/data.json'
-};

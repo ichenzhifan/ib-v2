@@ -8,8 +8,8 @@ import { workSpacePrecent, sideBarWidth, spreadTypes } from '../../contants/stri
 import { IMAGES_CROPPER, IMAGES_CROPPER_PARAMS } from '../../contants/apiUrl';
 import { combineImgCopperUrl, loadImg } from '../../../../common/utils/image';
 import { getRotatedAngle, getDefaultCropLRXY } from '../../../../common/utils/crop';
-import { Element } from '../../../../common/utils/entry';
 import { elementTypes } from '../../contants/strings';
+import { Element } from '../../../../common/utils/entry';
 
 import XDrop from '../../../../common/ZNOComponents/XDrop';
 import Loading from '../Loading';
@@ -37,7 +37,8 @@ class WorkSpace extends Component {
       const spreadOptions = this.formatSpreadOptions(spreads, texts);
 
       if (spreadOptions && spreadOptions.length) {
-        boundWorkspaceActions.changeSpread(spreadOptions[0]);
+        const index = this.getCurrentSpreadIndex();
+        boundWorkspaceActions.changeSpread(spreadOptions[index !== -1 ? index : 0]);
       }
 
       this.setState({
@@ -98,13 +99,13 @@ class WorkSpace extends Component {
       activePhotoElementIndex: 0,
 
       // 点击画布, 弹出的操作面板.
-      operations: {
-        shown: false,
-        offset: {
-          top: 150,
-          left: 500
-        }
-      }
+      // operations: {
+      //   shown: false,
+      //   offset: {
+      //     top: 150,
+      //     left: 500
+      //   }
+      // }
     };
 
     return state;
@@ -216,6 +217,10 @@ class WorkSpace extends Component {
    */
   onOutside() {
     const { boundWorkspaceActions } = this.props;
+
+    // 关闭operation panel.
+    boundWorkspaceActions.toggleOperationPanel(false);
+
     const index = this.getCurrentSpreadIndex();
     const spreadOptions = this.state.spreadOptions;
     if (spreadOptions && spreadOptions.length && !Object.is(index, 0)) {
@@ -228,6 +233,9 @@ class WorkSpace extends Component {
    */
   onInside() {
     const { boundWorkspaceActions } = this.props;
+    // 关闭operation panel.
+    boundWorkspaceActions.toggleOperationPanel(false);
+
     const index = this.getCurrentSpreadIndex();
     const spreadOptions = this.state.spreadOptions;
     if (spreadOptions && spreadOptions.length > 1 && !Object.is(index, 1)) {
@@ -238,24 +246,19 @@ class WorkSpace extends Component {
   /**
    * 显示或隐藏操作面板
    */
-  onSpreadClick(ev) {
-    // const event = ev || window.event;
-    // event.stopPropagation();
-    //
-    // // 隐藏或显示操作面板
-    // const operations = this.state.operations;
-    // const offset = {
-    //   top: event.clientY,
-    //   left: event.clientX
-    // };
-    // const newOperations = merge(operations, {
-    //   shown: !operations.shown,
-    //   offset
-    // });
-    //
-    // this.setState({
-    //   operations: newOperations
-    // });
+  toggleOperationPanel(ev) {
+    const { operationPanel, boundWorkspaceActions } = this.props;
+
+    const event = ev || window.event;
+    event.stopPropagation();
+
+    // 隐藏或显示操作面板
+    const offset = {
+      top: event.clientY,
+      left: event.clientX
+    };
+
+    boundWorkspaceActions.toggleOperationPanel(!operationPanel.status, offset);
   }
 
   /**
@@ -263,7 +266,10 @@ class WorkSpace extends Component {
    * @param ev
    */
   onCropImage(ev) {
-    const { boundSystemActions, baseUrls, imageArray, boundProjectActions } = this.props;
+    const { boundSystemActions, baseUrls, imageArray, boundProjectActions, boundWorkspaceActions } = this.props;
+
+    // 关闭operation panel.
+    boundWorkspaceActions.toggleOperationPanel(false);
 
     // 获取在当前的spread和处于活动状态的photoelement的索引.
     const { activePhotoElementIndex, currentSpread } = this.state;
@@ -309,6 +315,10 @@ class WorkSpace extends Component {
    * @param ev
    */
   onRotateImage(ev) {
+    const { boundWorkspaceActions } = this.props;
+    // 关闭operation panel.
+    boundWorkspaceActions.toggleOperationPanel(false);
+
     // 获取在当前的spread和处于活动状态的photoelement的索引.
     const { activePhotoElementIndex, currentSpread } = this.state;
     const activePhotoElement = get(currentSpread, `elementsOptions[${activePhotoElementIndex}]`);
@@ -322,7 +332,9 @@ class WorkSpace extends Component {
    * @param ev
    */
   onRemoveImage(ev) {
-    const { boundProjectActions } = this.props;
+    const { boundProjectActions, boundWorkspaceActions } = this.props;
+    // 关闭operation panel.
+    boundWorkspaceActions.toggleOperationPanel(false);
 
     // 获取在当前的spread和处于活动状态的photoelement的索引.
     const { activePhotoElementIndex, currentSpread } = this.state;
@@ -341,11 +353,13 @@ class WorkSpace extends Component {
   onSpreadDroped(event) {
     event.stopPropagation();
     event.preventDefault();
+
+    const { boundProjectActions, boundWorkspaceActions } = this.props;
+    // 关闭operation panel.
+    boundWorkspaceActions.toggleOperationPanel(false);
+
     const data = JSON.parse(event.dataTransfer.getData('drag'));
     const { boundSystemActions, boundUploadedImagesActions } = this.props;
-    const { boundWorkspaceActions } = this.props;
-
-    //boundUploadedImagesActions.updateUploadedImageUsedCount(data.imageId);
 
     if (data) {
       // 显示loading icon
@@ -434,7 +448,7 @@ class WorkSpace extends Component {
   getSpreadHtml() {
     let html = '';
     const currentSpread = this.state.currentSpread;
-    const { baseUrls, boundProjectActions, boundUploadedImagesActions, toggleModal, editText, ratio } = this.props;
+    const { baseUrls, boundProjectActions, boundUploadedImagesActions, boundWorkspaceActions, toggleModal, editText, ratio } = this.props;
     const { imageBaseUrl, texts, activePhotoElementIndex } = this.state;
     if (currentSpread && currentSpread.spreadOptions) {
       html = (<Spread spreadId={currentSpread.spreadOptions.id}
@@ -442,10 +456,12 @@ class WorkSpace extends Component {
                       elementsOptions={currentSpread.elementsOptions}
                       boundProjectActions={boundProjectActions}
                       imageBaseUrl={imageBaseUrl}
+                      toggleOperationPanel={this.toggleOperationPanel.bind(this)}
                       isPreview={false}
                       activePhotoElementIndex={activePhotoElementIndex}
                       baseUrls={baseUrls}
                       boundUploadedImagesActions={boundUploadedImagesActions}
+                      boundWorkspaceActions={boundWorkspaceActions}
                       toggleModal={toggleModal}
                       editText={editText}
                       ratio={ratio}
@@ -458,7 +474,7 @@ class WorkSpace extends Component {
   render() {
     console.log('workspace state', this.state);
     // t方法是用于本地化, 通过传入的key, 来获取对应的value.
-    const { children, t, loadingData, baseUrls, texts, boundTextOptionsActions, addText } = this.props;
+    const { children, t, loadingData, baseUrls, texts, boundTextOptionsActions, addText, operationPanel } = this.props;
 
     const workSpaceStyle = {
       width: `${this.state.currentSpread.workspaceWidth}px`,
@@ -474,7 +490,7 @@ class WorkSpace extends Component {
           <XAddText text={t('ADD_TEXT')} onClicked={addText}/>
         </div>
 
-        <div className="image-editor" onClick={this.onSpreadClick.bind(this)}>
+        <div className="image-editor">
           <XDrop onDroped={ this.onSpreadDroped.bind(this) }>
             {this.getSpreadHtml()}
           </XDrop>
@@ -486,7 +502,8 @@ class WorkSpace extends Component {
         </div>
 
         {/* 操作面板 */}
-        <OperationPanel { ...this.state.operations }
+        <OperationPanel shown={operationPanel.status}
+                        offset={operationPanel.offset}
                         onCropImage={this.onCropImage.bind(this)}
                         onRotateImage={this.onRotateImage.bind(this)}
                         onRemoveImage={this.onRemoveImage.bind(this)}

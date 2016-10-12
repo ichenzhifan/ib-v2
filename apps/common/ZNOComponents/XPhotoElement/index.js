@@ -56,7 +56,7 @@ export default class XPhotoElement extends Component {
   }
 
   render() {
-    const { className, children, canvasId, width, height } = this.props;
+    const { className, children, canvasId, width, height, onClicked } = this.props;
     const customClass = classNames('x-photo-element', className);
 
     return (
@@ -64,7 +64,7 @@ export default class XPhotoElement extends Component {
         <canvas id={canvasId} width={width} height={height}></canvas>
           {children}
           {/* 控制元素, 用于控制渲染出来的图片, 如缩放, 旋转等 */}
-          <XHandler />
+          <XHandler handleClick={onClicked}/>
       </div>
     );
   }
@@ -72,6 +72,8 @@ export default class XPhotoElement extends Component {
 
 XPhotoElement.propTypes = {
   className: PropTypes.string,
+
+
 
   // 画布的宽和高
   width: PropTypes.number.isRequired,
