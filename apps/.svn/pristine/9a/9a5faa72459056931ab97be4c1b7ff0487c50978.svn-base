@@ -1,0 +1,19 @@
+.to-homepage{
+  width:510px;
+  height:232px;
+  text-align:center;
+
+  .homepage-text{
+    line-height:25px;
+    padding:60px 10px 35px;
+    text-align:center;
+    font-size:16px;
+    color:#3a3a3a;
+  }
+  .button-white{
+  background:white;
+  margin-left:20px;
+  color:#393939;
+  border:1px solid #393939;
+  }
+}

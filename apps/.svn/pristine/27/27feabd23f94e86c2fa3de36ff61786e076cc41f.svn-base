@@ -1,0 +1,293 @@
+import 'isomorphic-fetch';
+import React, {Component} from 'react';
+import { translate } from 'react-translate';
+import XModal from '../../../../common/ZNOComponents/XModal';
+import XTextarea from '../../../../common/ZNOComponents/XTextarea';
+import { GET_FONTS } from '../../contants/apiUrl';
+import x2jsInstance from '../../utils/xml2js';
+import FontUrl from '../../components/FontUrl';
+import FontSize from '../../components/FontSize';
+import XSelect from '../../../../common/ZNOComponents/XSelect';
+import XButton from '../../../../common/ZNOComponents/XButton';
+import classNames from 'classnames';
+import './index.scss';
+
+class TextEditor extends Component {
+  constructor(props) {
+      super(props);
+      this.state = {
+        text: '',
+        families: null,
+        fontFamily: '',
+        fontStyle: '',
+        fontSize: 0,
+        fontColor: '',
+        fontOptions: null,
+        styleOptions: null,
+        isDoneDisabled: true,
+        colorOptions: [
+          {
+            label: 'Black',
+            value: '0'
+          },
+          {
+            label: 'Gray',
+            value: '6712688'
+          },
+          {
+            label: 'Light Gray',
+            value: '13289166'
+          },
+          {
+            label: 'White',
+            value: '16711422'
+          },
+          {
+            label: 'Cardinal',
+            value: '10497843'
+          },
+          {
+            label: 'Red',
+            value: '16711680'
+          },
+          {
+            label: 'Pink',
+            value: '16042184'
+          },
+          {
+            label: 'Orange',
+            value: '15690240'
+          },
+          {
+            label: 'Gold',
+            value: '14202129'
+          },
+          {
+            label: 'Yellow',
+            value: '16776960'
+          },
+          {
+            label: 'Green',
+            value: '5679643'
+          },
+          {
+            label: 'Navy',
+            value: '13158'
+          }
+        ]
+      }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(this.props.opened!==nextProps.opened && nextProps.textOptions==null){
+      this.resetState(this.state.families);
+    }
+  }
+
+  componentDidMount() {
+    this.loadOptions();
+  }
+
+  resetState(families) {
+    let defaultStyle;
+    const fontOptions = families.fontFamilies.fontFamily.map(item=>{
+      let fontStyle = [];
+      if (Array.isArray(item.font)) {
+        fontStyle = item.font.map(font=>{
+         return {
+           label: font.displayName,
+           value: font.fontFamily,
+           isDefault: font.isDefault ? true : false
+         };
+       });
+       fontStyle.map(style=>{
+         if(style.isDefault){
+           defaultStyle = style;
+         }
+       })
+     }else{
+       fontStyle.push({
+         label: item.font.displayName,
+         value: item.font.fontFamily,
+         isDefault: true
+       });
+       defaultStyle = fontStyle[0];
+     }
+      return {
+        value: item.displayName,
+        label: item.displayName,
+        id: item.id,
+        fontStyle: fontStyle
+      };
+    });
+    this.setState({
+      families: families,
+      fontFamily: fontOptions[0],
+      styleOptions: fontOptions[0].fontStyle,
+      fontStyle: defaultStyle,
+      fontOptions: fontOptions,
+      fontSize: 0,
+      fontColor: this.state.colorOptions[0],
+      text: ''
+    });
+  }
+
+  loadOptions() {
+    fetch(GET_FONTS)
+      .then((response)=>{
+        return response.text();
+      }).then((response)=>{
+        const families =  x2jsInstance.xml2js(response);
+        this.resetState(families)
+      });
+      this.setState({
+        fontColor: this.state.colorOptions[0]
+      })
+  }
+
+  handleClosed() {
+      const { onClosed } = this.props;
+      onClosed();
+  }
+
+  onTextChanged(event) {
+    var value = event.target.value;
+    this.setState({
+      text: value
+    });
+    alert(1)
+    if(value.trim()){
+      this.setState({
+        isDoneDisabled: false
+      })
+    }else{
+      this.setState({
+        isDoneDisabled: true
+      })
+    }
+  }
+
+  setTextValue(value){
+    let fontStyle = [];
+    let defaultStyle;
+    this.state.fontOptions.map(item=>{
+      if (value.id === item.id) {
+        if (Array.isArray(item.fontStyle)){
+          fontStyle = item.fontStyle.map(fontStyle=>{
+            if(fontStyle.isDefault){
+              defaultStyle = fontStyle;
+            }
+            return {
+               label: fontStyle.label,
+               value: fontStyle.value,
+               isDefault: fontStyle.isDefault
+             };
+           });
+        }else{
+          defaultStyle = fontStyle;
+          fontStyle.push({
+            label: item.fontStyle.label,
+            value: item.fontStyle.value,
+            isDefault: true
+          });
+        }
+      }
+    });
+    this.setState({
+      fontFamily: value,
+      fontStyle: defaultStyle,
+      styleOptions: fontStyle
+    })
+  }
+
+  setStyleValue(value){
+    this.setState({
+      fontStyle: value
+    })
+  }
+
+  setColorValue(value){
+    this.setState({
+      fontColor: value
+    })
+  }
+
+  handleSliderChange(value){
+    this.setState({
+      fontSize: value
+    })
+  }
+
+  handleSizeChange(value) {
+    this.setState({
+      fontSize: value
+    })
+  }
+
+  handleDoneClick() {
+    const { boundTextOptionsActions } = this.props;
+    const { text, fontFamily, fontStyle, fontSize, fontColor } = this.state;
+    boundTextOptionsActions.saveTextOptions(text, fontFamily.value,fontStyle.value, fontSize, fontColor.value );
+    this.handleClosed();
+  }
+
+  render() {
+    const {opened,t} = this.props;
+    const DoneButtonClass = classNames('row buttons', {
+      disabled: this.state.isDoneDisabled
+    });
+    return (
+      <XModal
+        className="texteditor-modal"
+        onClosed={ this.handleClosed.bind(this) }
+        opened={opened}
+      >
+        <div className="text-editor">
+          <h3 className="title">
+            { t('TEXT_EDITOR') }
+          </h3>
+          <div className="editor">
+            <XTextarea onChanged={this.onTextChanged.bind(this)} value={this.state.text}/>
+            <div className="row">
+              <div className="col col-2">
+                <label>{ t('FONT_FAMILY') }</label>
+                <XSelect options={this.state.fontOptions}
+                         onChanged={this.setTextValue.bind(this)}
+                         value={this.state.fontFamily}
+                         optionComponent={FontUrl}/>
+              </div>
+              <div className="col col-2">
+                <label className="right">{ t('FONT_STYLE') }</label>
+                <XSelect options={this.state.styleOptions}
+                         onChanged={this.setStyleValue.bind(this)}
+                         value={this.state.fontStyle} />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col col-2">
+                <label>{ t('FONT_SIZE') }</label>
+                <FontSize value={this.state.fontSize}
+                          handleSliderChange={this.handleSliderChange.bind(this)}
+                          handleSizeChange={this.handleSizeChange.bind(this)} />
+              </div>
+              <div className="col col-2">
+                <label className="right">{ t('FONT_COLOR') }</label>
+                <XSelect options={this.state.colorOptions}
+                           onChanged={this.setColorValue.bind(this)}
+                           value={this.state.fontColor}
+                           />
+              </div>
+            </div>
+            <div className={DoneButtonClass}>
+              <XButton onClicked={this.handleDoneClick.bind(this)}>
+                { t('DONE') }
+              </XButton>
+            </div>
+          </div>
+        </div>
+      </XModal>
+    )
+  }
+}
+
+export default translate('TextEditor')(TextEditor);

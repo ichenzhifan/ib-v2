@@ -1,0 +1,29 @@
+import { merge, get } from 'lodash';
+import qs from 'qs';
+import { API_SUCCESS } from '../contants/actionTypes';
+import { GET_PROJECT_DATA } from '../contants/apiUrl';
+import { xml2js } from '../utils/xml2js';
+
+
+const project = (state = {}, action) => {
+  switch (action.type) {
+    case API_SUCCESS: {
+      switch (action.api) {
+        case GET_PROJECT_DATA: {
+          const xmlData = action.response;
+          const projectObj = xml2js(xmlData).project;
+
+          return merge(state, {
+            __originalData__: projectObj
+          });
+        }
+        default:
+          return state;
+      }
+    }
+    default:
+      return state;
+  }
+};
+
+export default project;

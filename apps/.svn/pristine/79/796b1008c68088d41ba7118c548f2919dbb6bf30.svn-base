@@ -1,0 +1,10 @@
+import X2JS from 'x2js';
+
+const x2jsInstance = new X2JS({
+  attributePrefix: ''
+});
+
+
+export const xml2js = x2jsInstance.xml2js;
+
+export const js2xml = x2jsInstance.js2xml;

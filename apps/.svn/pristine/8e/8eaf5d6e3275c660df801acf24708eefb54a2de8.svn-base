@@ -1,0 +1,219 @@
+import React, { Component, PropTypes } from 'react';
+import Cropper from 'cropperjs';
+import { isEqual } from 'lodash';
+
+import XModal from '../XModal';
+import XButton from '../XButton';
+
+
+import './index.scss';
+
+
+class ImageEditModal extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      imgWidth: 0,
+      imgHeight: 0,
+      imgRatio: 0,
+      cropper: null
+    };
+
+    this.rotateLeft = this.rotateLeft.bind(this);
+    this.rotateRight = this.rotateRight.bind(this);
+  }
+
+
+
+  componentWillReceiveProps (nextProps) {
+
+    if (!isEqual(this.props, nextProps)) {
+
+      const newImgSrc = nextProps.imgSrc;
+      const newAspectRatio = nextProps.aspectRatio;
+
+      const { MAX_CONTAINER_HEIGHT, MAX_CONTAINER_WIDTH } = this.props;
+      const self = this;
+      const { image } = this.refs;
+      image.onload = function () {
+        const imgRatio = this.width / this.height;
+        if (this.width > this.height) {
+          self.setState({
+            originalWidth: this.width,
+            originalHeight: this.height,
+            imgWidth: MAX_CONTAINER_WIDTH,
+            imgHeight: MAX_CONTAINER_WIDTH / imgRatio,
+            imgRatio
+          })
+
+        } else {
+          self.setState({
+            originalWidth: this.width,
+            originalHeight: this.height,
+            imgWidth: MAX_CONTAINER_HEIGHT * imgRatio,
+            imgHeight: MAX_CONTAINER_HEIGHT,
+            imgRatio
+          })
+        }
+      };
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.imgSrc !== this.props.imgSrc) {
+      const { image } = this.refs;
+      const { imgWidth, imgHeight } = this.state;
+      const cropper = new Cropper(image, {
+        aspectRatio: this.props.aspectRatio,
+        viewMode: 1,
+        minContainerWidth: imgWidth,
+        minContainerHeight: imgHeight,
+        crop: function(e) {
+          console.log(e.detail.x);
+          console.log(e.detail.y);
+          console.log(e.detail.width);
+          console.log(e.detail.height);
+          console.log(e.detail.rotate);
+          console.log(e.detail.scaleX);
+          console.log(e.detail.scaleY);
+        }
+      });
+
+      this.setState({
+        cropper
+      });
+    }
+  }
+
+
+  resizeCropContainer () {
+    const { cropper } = this.state;
+    const imageData = cropper.getImageData();
+
+    const { image } = this.refs;
+    const { imgWidth, imgHeight, imgRatio } = this.state;
+    const { MAX_CONTAINER_HEIGHT, MAX_CONTAINER_WIDTH, aspectRatio } = this.props;
+    switch (Math.abs(imageData.rotate)) {
+      // portrait
+      case 90:
+      case 270: {
+        this.setState({
+          imgWidth: imgHeight,
+          imgHeight: imgWidth
+        });
+
+        cropper.destroy();
+        this.setState({
+          cropper: new Cropper(image, {
+            aspectRatio,
+            viewMode: 1,
+            minContainerWidth: imgHeight,
+            minContainerHeight: imgWidth,
+            crop: function(e) {
+              console.log(e.detail.x);
+              console.log(e.detail.y);
+              console.log(e.detail.width);
+              console.log(e.detail.height);
+              console.log(e.detail.rotate);
+              console.log(e.detail.scaleX);
+              console.log(e.detail.scaleY);
+            }
+          })
+        })
+
+        break;
+      }
+
+      // landscape
+      case 0:
+      case 180: {
+        this.setState({
+          imgWidth: MAX_CONTAINER_WIDTH,
+          imgHeight: MAX_CONTAINER_WIDTH / imgRatio,
+        });
+        cropper.cropper.render();
+        break;
+      }
+
+      default:
+    }
+  }
+
+  rotateLeft () {
+    const { cropper } = this.state;
+    cropper.rotate(-90);
+    this.resizeCropContainer();
+  }
+
+  rotateRight () {
+    const { cropper } = this.state;
+    cropper.rotate(90);
+    this.resizeCropContainer();
+  }
+
+  render() {
+    const {
+      isShown,
+      imgSrc,
+      onDoneClick,
+      onCancelClick
+    } = this.props;
+
+    const { imgWidth, imgHeight } = this.state;
+
+    return (
+      <XModal
+        className="image-edit-modal"
+        opened={isShown}
+        onClosed={onCancelClick}
+      >
+        <h3 className="modal-title">Set Image</h3>
+        <div className="image-name">AEAE09876</div>
+        <div className="cropper-area">
+          <img
+            ref="image"
+            src={imgSrc}
+            style={{ height: imgHeight, width: imgWidth }}
+          />
+        </div>
+
+
+        <div className="rotate-controls">
+          <div className="left-control">
+            <button className="left-button" onClick={this.rotateLeft} />
+            <p className="description">-90&deg;</p>
+          </div>
+          <div className="right-control">
+            <button className="right-button" onClick={this.rotateRight} />
+            <p className="description">+90&deg;</p>
+          </div>
+        </div>
+
+        <p className="modal-foot">
+          <XButton
+            onClicked={onDoneClick}
+          >
+            Done
+          </XButton>
+        </p>
+      </XModal>
+    );
+  }
+}
+
+ImageEditModal.propTypes = {
+  isShown: PropTypes.bool.isRequired,
+  imgSrc: PropTypes.string.isRequired,
+  onDoneClick: PropTypes.func.isRequired,
+  aspectRatio: PropTypes.number,
+  onCancelClick: PropTypes.func
+};
+
+ImageEditModal.defaultProps = {
+  MAX_CONTAINER_WIDTH: 480,
+  MAX_CONTAINER_HEIGHT: 310
+}
+
+
+export default ImageEditModal;

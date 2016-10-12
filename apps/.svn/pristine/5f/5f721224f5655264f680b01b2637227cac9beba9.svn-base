@@ -1,0 +1,93 @@
+import { ADD_IMAGES, UPDATE_IMAGEID, UPDATE_PERCENT, UPLOAD_COMPLETE, UPDATE_FIELDS } from '../contants/actionTypes';
+import x2jsInstance from '../utils/xml2js';
+import request from '../utils/ajax';
+import { combine } from '../utils/url';
+import { PENDING, DONE, PROGRESS, FAIL } from '../contants/uploadStatus';
+import { UPLOAD_BASE, GET_IMAGE_IDS, UPLOAD_IMAGES } from '../contants/apiUrl';
+
+export function addImages(files) {
+  return (dispatch, getState) => {
+    const { userInfo } = getState().system.env;
+    dispatch({type: ADD_IMAGES,files})
+    request({
+      url : combine(UPLOAD_BASE,GET_IMAGE_IDS,{
+        imageIdCount :files.length
+      }),
+      success : function(result){
+        if (result) {
+          const xmlData = x2jsInstance.xml2js(result);
+          const idCount = xmlData.imageIds.id.length;
+          for(let i=0;i<idCount;i++){
+            const currentId =  xmlData.imageIds.id[i] || xmlData.imageIds.id;
+            dispatch({
+              type: UPDATE_IMAGEID,
+              index:i,
+              imageId:currentId});
+            const file = files[i];
+            const formData = new FormData();
+            formData.append('uid', userInfo.userId);
+            formData.append('timestamp', userInfo.timestamp);
+            formData.append('token', userInfo.token);
+            formData.append('albumId', "118450");
+            formData.append('albumName', "test title");
+            formData.append('Filename', file.name);
+            formData.append('filename', file);
+            // 更新上传状态
+            dispatch({
+              type:UPDATE_FIELDS,
+              imageId:currentId,
+              fields : {
+                status : PROGRESS
+            }});
+            const xhr = request({
+                url : combine(UPLOAD_BASE,UPLOAD_IMAGES,{
+                imageId : currentId
+              }),
+              method : 'post',
+              data : formData,
+              success : function(res){
+                const xmlRes = x2jsInstance.xml2js(res);
+                console.log(xmlRes);
+                // 更新成功状态
+               dispatch({
+                  type: UPDATE_FIELDS,
+                  imageId: currentId,
+                  fields : {
+                    status : DONE,
+                    subfix : '',
+                    percent : 'Done',
+                    totalSize : xmlRes.resultData.img.size,
+                    guid: xmlRes.resultData.img.guid,
+                    uploadTime: xmlRes.resultData.img.insertTime,
+                }});
+              },
+              progress : function(data){
+                dispatch({type: UPDATE_PERCENT,
+                  imageId:currentId,
+                  percent:Math.floor(data.loaded/data.total*100)});
+              },
+              error : function(){
+                // 更新失败状态
+                dispatch({
+                  type:UPDATE_FIELDS,
+                  imageId:currentId,
+                  fields : {
+                    status : FAIL,
+                    subfix : ''
+                }});
+              }
+            });
+            //更新xhr
+             dispatch({
+                type:UPDATE_FIELDS,
+                imageId:currentId,
+                fields : {
+                  xhr : xhr,
+              }});
+          }
+        }
+      }
+    })
+  }
+}
+

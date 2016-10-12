@@ -1,0 +1,108 @@
+import { get } from 'lodash';
+import { CALL_API } from '../middlewares/api';
+import { GET_PROJECT_DATA, SAVE_PROJECT } from '../contants/apiUrl';
+import {
+  CHANGE_PROJECT_SETTING,
+  CREATE_ELEMENT,
+  UPDATE_ELEMENT,
+  DELETE_ELEMENT,
+  INIT_SPREAD_ARRAY
+} from '../contants/actionTypes';
+
+export function getProjectData(userId, projectId) {
+  return (dispatch, getState) => {
+    const baseUrl = get(getState(), 'system.env.urls.baseUrl');
+    return dispatch({
+      [CALL_API]: {
+        apiPattern: {
+          name: GET_PROJECT_DATA,
+          params: { baseUrl, userId, projectId }
+        }
+      }
+    }).then((res) => {
+      const serverOptions = get(res, 'project.imageBox.spec.option');
+      const newSetting = {};
+      serverOptions.forEach((option) => {
+        // 兼容老数据
+        if (option.id === 'thickness') {
+          newSetting.spineThickness = option.value;
+        } else {
+          newSetting[option.id] = option.value;
+        }
+      });
+      dispatch({
+        type: CHANGE_PROJECT_SETTING,
+        setting: newSetting
+      });
+
+      const serverSpreads = get(res, 'project.imageBox.spreads');
+      dispatch({
+        type: INIT_SPREAD_ARRAY,
+        spreads: serverSpreads
+      });
+    });
+  };
+}
+
+
+export function changeProjectSetting(setting) {
+  return {
+    type: CHANGE_PROJECT_SETTING,
+    setting
+  };
+}
+
+export function saveProject(projectId, userId, projectXmlString) {
+  return (dispatch, getState) => {
+    const baseUrl = get(getState(), 'system.env.urls.baseUrl');
+    return dispatch({
+      [CALL_API]: {
+        apiPattern: {
+          name: SAVE_PROJECT,
+          params: { baseUrl, userId, projectId }
+        },
+        request: {
+          projectXml: projectXmlString,
+          thumbnailPX: 0,
+          thumbnailPY: 0,
+          thumbnailPW: 1,
+          thumbnailPH: 1,
+          requestKey: Date.now()
+        }
+      }
+    });
+  };
+}
+
+export function initSpreadArray(spreads) {
+  return {
+    type: INIT_SPREAD_ARRAY,
+    spreads
+  };
+}
+
+
+export function createElement(spreadId, element) {
+  return {
+    type: CREATE_ELEMENT,
+    spreadId,
+    element
+  };
+}
+
+export function updateElement(spreadId, elementId, newAttribute) {
+  return {
+    type: UPDATE_ELEMENT,
+    spreadId,
+    elementId,
+    newAttribute
+  };
+}
+
+export function deleteElement(spreadId, elementId) {
+  return {
+    type: DELETE_ELEMENT,
+    spreadId,
+    elementId
+  };
+}

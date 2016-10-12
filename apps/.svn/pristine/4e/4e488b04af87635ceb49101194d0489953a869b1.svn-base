@@ -1,0 +1,12 @@
+import { CALL_API } from '../middlewares/api';
+import { GET_PROJECT_DATA } from '../contants/apiUrl';
+
+export function getProjectData() {
+  return (dispatch) => {
+    return dispatch({
+      [CALL_API]: {
+        api: GET_PROJECT_DATA
+      }
+    });
+  };
+}

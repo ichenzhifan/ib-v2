@@ -1,0 +1,79 @@
+import React, { Component, PropTypes } from 'react';
+import XButton from '../../../../common/ZNOComponents/XButton';
+import './index.scss';
+
+export default class SideBar extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedSize: null,
+    };
+
+  }
+  
+  render() {
+    const { hideUsedToggle, optionChange, onChange } = this.props;
+
+    return (
+      <aside className="side-bar">
+        <div className="list-tab">
+          <div className="list-tab-selected">Images</div>
+          <div className="list-tab-noselect"></div>
+        </div>
+      
+         <XButton className="upload-button">
+         <input type="file"/>
+         <span>Add Photo</span>
+         </XButton>
+
+        <div className="upload-hide">
+          <div className="t-left">
+            <select className="upload-time" onChange={optionChange}>
+              <option value="" >Sort By Upload Time</option>
+            </select>
+            <div className="sort" onClick={this.handleSort.bind(this)}></div>
+          </div>
+          <div className="t-right">
+            <input type="checkbox" id="hideUsed" onClick={this.handleHideUsedToggle.bind(this)}/><label htmlFor="hideUsed" className="hide-used">Hide Used</label>
+          </div>
+        </div>
+
+        <div className="list-image">
+
+          <div className="item-image">
+            <div className="loaded-image">
+              <img className="preview-image"/>
+              <div className="icon-count"></div>
+              <div className="delete" onClick={this.handleDelete.bind(this)}></div>
+            </div>
+            <div className="preview-image-tip"></div>
+          </div>
+          <div className="item-image">
+            <div className="loaded-image">
+              <img className="preview-image"/>
+            </div>
+            <div className="preview-image-tip"></div>
+          </div>
+
+
+        </div>
+
+      </aside>
+    );
+  }
+  handleSort(){
+    // alert("Sort By Upload Time");
+  }
+  handleHideUsedToggle(){
+    // alert("Hide Used toggle");
+  }
+  handleDelete(){
+    // alert("delete")
+  }
+}
+
+SideBar.propTypes = {
+  hideUsedToggle: PropTypes.func.isRequired,
+  optionChange: PropTypes.func.isRequired
+}

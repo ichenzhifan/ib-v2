@@ -1,0 +1,31 @@
+<project schemaVersion="2.0" clientId="web-h5">
+  <guid>130468</guid>
+  <userId>235002</userId>
+  <artisan>Li</artisan>
+  <title>asdfasfs</title>
+  <description/>
+  <createdDate>2016-09-13 18:07:37</createdDate>
+  <updatedDate>2016-09-13 18:07:37</updatedDate>
+  <uiSetting>
+    <templateStrip>…</templateStrip>
+  </uiSetting>
+  <photoFrame>
+    <spec version="3.13">
+      <option id="category" value="none"/>
+      <option id="product" value="canvas"/>
+      <option id="frameStyle" value="none"/>
+      <option id="size" value="10X24"/>
+      <option id="color" value="none"/>
+      <option id="paper" value="TP"/>
+      <option id="metalType" value="none"/>
+      <option id="matte" value="none"/>
+      <option id="matteStyle" value="none"/>
+      <option id="glassStyle" value="none"/>
+      <option id="canvasBorder" value="image"/>
+      <option id="finish" value="none"/>
+      <option id="canvasBorderSize" value="standard"/>
+    </spec>
+    <frameBoard rotated="true" height="3755.622048" width="7960.346457" frameBorderThicknessTop="0" frameBorderThicknessBottom="0" frameBorderThicknessLeft="0" frameBorderThicknessRight="0" canvasBorderThicknessTop="366" canvasBorderThicknessBottom="366" canvasBorderThicknessLeft="366" canvasBorderThicknessRight="366" boardInFrameTop="0" boardInFrameBottom="0" boardInFrameLeft="0" boardInFrameRight="0" boardInMattingTop="0" boardInMattingBottom="0" boardInMattingLeft="0" boardInMattingRight="0" canvasBorderColor="16777215">…</frameBoard>
+  </photoFrame>
+  <images/>
+</project>

@@ -1,0 +1,88 @@
+import { get } from 'lodash';
+import { API_SUCCESS } from '../contants/actionTypes';
+import { LOGIN } from '../contants/apiUrl';
+
+const sKey = 'COOKIES_IN_STORAGE';
+
+/**
+ * 设置cookie
+ * @param data
+ */
+const setCookie = data => {
+  document.cookie = data;
+};
+
+/**
+ * 把cookie数组保存到localstorage
+ * @param data
+ */
+const setToStorage = data => {
+  localStorage.setItem(sKey, JSON.stringify(data));
+
+  // 设置cookie
+  if (data && data.length) {
+    setCookie(data[data.length - 1]['Set-Cookie']);
+  }
+}
+
+/**
+ * 从localstorage中获取上次的cookie
+ * @returns {Array}
+ */
+const getInitCookies = () => {
+  const result = localStorage.getItem(sKey);
+
+  if (result) {
+    let data = JSON.parse(result);
+    setCookie(data[data.length - 1]['Set-Cookie']);
+
+    return data;
+  }
+
+  return [];
+}
+
+// 获取cookie的默认值.
+const defaultCookies = getInitCookies();
+
+/**
+ * cookies的reducer, 把新获取的cookie更新到store.
+ * @param state
+ * @param action
+ */
+export const cookies = (state = defaultCookies, action) => {
+  switch (action.type) {
+    case API_SUCCESS:
+      if (action.api.includes(LOGIN)) {
+        const result = JSON.parse(action.response);
+        const myCookies = get(result, 'cookies');
+
+        setToStorage(myCookies);
+
+        return myCookies || [];
+      }
+      return state;
+    default:
+      return state;
+  }
+};
+
+/**
+ * userInfo的reducer, 把获取到的userInfo更新到store
+ * @param state
+ * @param action
+ */
+export const userInfo = (state = {}, action) => {
+  switch (action.type) {
+    case API_SUCCESS:
+      if (action.api.includes(LOGIN)) {
+        const result = JSON.parse(action.response);
+        return get(result, 'userInfo') || {};
+      }
+      return state;
+    default:
+      return state;
+  }
+};
+
+

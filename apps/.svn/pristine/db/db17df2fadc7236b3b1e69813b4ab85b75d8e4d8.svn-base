@@ -1,0 +1,52 @@
+import React, { Component, PropTypes } from 'react';
+import classNames from 'classnames';
+import './index.scss';
+
+
+export default class ImageItem extends Component{
+    constructor(props){
+        super(props)
+    }
+
+
+
+    render(){
+
+        // const { className, children} = this.props;
+        // const ClassName = classNames('image-item', className);
+        const {  } = this.props;
+        return(
+            <div className="image-item">
+                <div className="loaded-image">
+                    <img className="preview-image"/>
+                    <div className="icon-count"></div>
+                    <div className="icon-delete"></div>
+                </div>
+                <div className="preview-image-tip">aaaaaaa</div>
+            </div>
+            //   {
+            //         imageList
+            //         ? imageList.map((item,index) => {
+            //             const imgId = `img-${item.id}`;
+            //             return(
+            //                 <div key={index}>
+            //                     <div className="image-item">
+            //                         <div className="loaded-image">
+            //                             <img className="preview-image" id={imgId}/>
+            //                             <div className="icon-count"></div>
+            //                             <div className="icon-delete"></div>
+            //                         </div>
+            //                         <div className="preview-image-tip">aaaaaaa</div>
+            //                     </div>
+            //                 </div>
+            //             )
+            //         })
+            //         : null
+            //  }
+        );
+    }
+}
+
+ImageItem.propTypes = {
+
+}

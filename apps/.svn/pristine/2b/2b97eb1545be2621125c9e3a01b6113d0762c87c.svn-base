@@ -1,0 +1,12 @@
+import { SAVE_TEXT_OPTIONS } from '../contants/actionTypes';
+
+export function saveTextOptions(text, fontFamily, fontStyle, fontSize, fontColor) {
+  return {
+    type: SAVE_TEXT_OPTIONS,
+    text,
+    fontFamily,
+    fontStyle,
+    fontSize,
+    fontColor
+  };
+}

@@ -1,0 +1,32 @@
+import { merge, get, pick } from 'lodash';
+import qs from 'qs';
+import { API_SUCCESS } from '../contants/actionTypes';
+import { GET_PROJECT_DATA } from '../contants/apiUrl';
+import x2jsInstance from '../utils/xml2js';
+
+
+const queryStringObj = qs.parse(window.location.search.substr(1));
+const initialState = pick(queryStringObj, ['title', 'size', 'product']);
+
+const project = (state = initialState, action) => {
+  switch (action.type) {
+    case API_SUCCESS: {
+      switch (action.api) {
+        case GET_PROJECT_DATA: {
+          const xmlData = action.response;
+          const projectObj = x2jsInstance.xml2js(xmlData).project;
+
+          return merge(state, {
+            __originalData__: projectObj
+          });
+        }
+        default:
+          return state;
+      }
+    }
+    default:
+      return state;
+  }
+};
+
+export default project;

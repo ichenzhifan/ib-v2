@@ -1,0 +1,63 @@
+.font-light {
+    font-family: "Gotham SSm A", "Gotham SSm B", Arial;
+    font-weight: 300;
+  }
+
+.image-item{
+    margin-left: 27px;
+    margin-bottom: 20px;
+    float: left;
+    height: 164px;
+    width: 150px;
+    box-sizing: border-box;
+
+
+    .loaded-image{
+      width: 150px;
+      height: 150px;
+      position: relative;
+      box-sizing: border-box;
+      border: 5px solid #fff;
+      box-shadow: 0 3px 6px #e1e1e1;
+
+      &:hover{
+        cursor: move;
+        .icon-delete{
+          width: 20px;
+          height: 20px;
+          position: absolute;
+          top: 130px;
+          left: 130px;
+          background: url("./delete.svg") no-repeat;
+          &:hover{
+            cursor: pointer;
+          }
+        }
+     }
+
+     .preview-image{
+       display: inline-block;
+       width: 140px;
+       height: 140px;
+       border: none;
+      //  background: url("./delete.svg");
+     }
+
+    }
+    .icon-count{
+      width: 27px;
+      height: 24px;
+      position: absolute;
+      top: 107px;
+      left: -13px;
+      background: url("./icon_count.png") no-repeat;
+    }
+    .preview-image-tip{
+      @extend .font-light;
+      margin-top: 5px;
+      text-align: center;
+      color: #7b7b7b;
+      font-size: 12px;
+    }
+
+  }

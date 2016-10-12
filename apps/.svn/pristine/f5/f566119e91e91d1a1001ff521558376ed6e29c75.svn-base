@@ -1,0 +1,12 @@
+.image-list{
+  box-sizing: border-box;
+  overflow: auto;
+  position: absolute;
+  width: 100%;
+  top: 84px;
+  bottom: 0;
+
+  .image-items{
+    overflow: auto;
+  }
+}

@@ -1,0 +1,38 @@
+import React, { Component, PropTypes } from 'react';
+import './index.scss';
+import logo from './new-logo-white.svg';
+
+class XHeader extends Component {
+  constructor(props) {
+    super(props);
+    this.handleGoHome = this.handleGoHome.bind(this);
+  }
+  // 点击logo 进入主页时候的执行函数
+  handleGoHome() {
+    false
+    ? window.location = '//www.zno.com.dd'
+    : this.props.showRedirectHomeModal();
+  }
+
+  render() {
+    const { children } = this.props;
+
+    return (
+      <div className="mod-header">
+        <div className="logo" onClick={this.handleGoHome}>
+          <img src={logo} alt="logo" />
+        </div>
+        <div className="header-area">
+          {children}
+        </div>
+      </div>
+    );
+  }
+}
+
+XHeader.propTypes = {
+  showRedirectHomeModal: PropTypes.func.isRequired,
+  children: PropTypes.element
+};
+
+export default XHeader;

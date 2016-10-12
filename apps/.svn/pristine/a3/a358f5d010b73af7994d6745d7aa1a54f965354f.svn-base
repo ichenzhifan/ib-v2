@@ -1,0 +1,85 @@
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { set } from 'lodash';
+
+import * as specActions from '../../actions/specActions';
+import * as projectActions from '../../actions/projectActions';
+
+import MainContainer from '../../components/MainContainer';
+
+import 'normalize.css';
+import './index.scss';
+
+import PageHeader from '../../components/PageHeader';
+import SideBar from '../../components/SideBar';
+import WorkSpace from '../../components/WorkSpace';
+import XModal from '../../../../common/ZNOComponents/XModal';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+
+    // 定义一些初始化值.
+    this.state = {
+      modalSwitches: {
+        options: false
+      }
+    };
+  }
+
+  /**
+   * 显示或关闭modal
+   * @param {string} type 待关闭的modal在state中key的值(this.state.modalSwitches).
+   * @param {bool} status true/false, modal是显示还是关闭
+   */
+  toggleModal(type, status) {
+    let state = set(this.state, `modalSwitches.${type}`, status);
+    this.setState(state);
+  }
+
+  render() {
+    // Injected by connect() call:
+    const { boundSpecActions, boundProjectActions, spec } = this.props;
+
+    return (
+      <MainContainer
+        className="app"
+        boundSpecActions={boundSpecActions}
+        boundProjectActions={boundProjectActions}
+      >
+        <PageHeader />
+
+        <SideBar
+          className="side-bar"
+          spec={spec} />
+        <WorkSpace >
+          {/* 显示弹窗 */}
+          <input type="button" value="显示弹窗"
+                 onClick={this.toggleModal.bind(this, 'options', true)}
+                 className="cursor-p" />
+        </WorkSpace>
+
+        {/* 弹框占位符 */}
+        <XModal className="aa"
+                onClosed={this.toggleModal.bind(this, 'options', false)}
+                opened={this.state.modalSwitches.options}>
+          <h1>this is modal1</h1>
+        </XModal>
+
+      </MainContainer>
+    );
+  }
+}
+
+// 包装 component ，注入 dispatch 和 state 到其默认的 connect(select)(App) 中；
+const mapStateToProps = state => ({
+  spec: state.spec
+});
+
+const mapDispatchToProps = dispatch => ({
+  boundSpecActions: bindActionCreators(specActions, dispatch),
+  boundProjectActions: bindActionCreators(projectActions, dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

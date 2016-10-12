@@ -1,0 +1,66 @@
+import { template } from 'lodash';
+import { CALL_API } from '../middlewares/api';
+import { API_BASE, GET_ENV, GET_SESSION_USER_INFO, USER_ID, GET_USER_ALBUM_ID } from '../contants/apiUrl';
+import { combine, getUrl } from '../../../common/utils/url';
+import { webClientId } from '../../../common/utils/strings';
+import { getRandomNum } from '../../../common/utils/math';
+import { title } from '../../../common/utils/querystring';
+
+/**
+ * action, 获取环境变量, 如各种api的根路径
+ */
+export function getEnv() {
+  let url = combine(API_BASE, GET_ENV, {
+    webClientId,
+    autoRandomNum: getRandomNum()
+  });
+
+  return (dispatch) => {
+    return dispatch({
+      [CALL_API]: {
+        api: url
+      }
+    });
+  };
+}
+
+/**
+ * action, 获取用户的会话信息
+ */
+export function getUserInfo() {
+  return (dispatch, getState) => {
+    const API_BASE = getUrl(getState(), 'system.env.urls.baseUrl');
+
+    let url = combine(API_BASE, GET_SESSION_USER_INFO, {
+      webClientId,
+      autoRandomNum: getRandomNum()
+    });
+
+    return dispatch({
+      [CALL_API]: {
+        api: url
+      }
+    });
+  };
+}
+
+/**
+ * action, 获取用户的Album id
+ */
+export function getAlbumId() {
+  return (dispatch, getState) => {
+    const API_BASE = getUrl(getState(), 'system.env.urls.baseUrl');
+    const id = getUrl(getState(), 'system.env.userInfo.userId');
+
+    let url = combine(API_BASE, template(GET_USER_ALBUM_ID)({ userId: id }), {
+      // todo: title必须有值在线上环境.
+      albumName: encodeURIComponent(title || 'test')
+    });
+
+    return dispatch({
+      [CALL_API]: {
+        api: url
+      }
+    });
+  };
+}

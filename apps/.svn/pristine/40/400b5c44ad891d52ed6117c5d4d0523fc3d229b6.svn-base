@@ -1,0 +1,73 @@
+import React, { Component } from 'react';
+import XModal from "../../../../common/ZNOComponents/XModal";
+import './index.scss';
+import close from './close.png';
+
+export default class Upload extends Component {
+	constructor(props) {
+    super(props);
+	}
+
+  render() {
+    return (
+      <XModal className="upload-modal"
+              onClosed={ this.props.onClosed }
+              opened={ this.props.opened }>
+          <div className="box-image-upload">
+            <h3 className="title">Upload Images</h3>
+            <ul className="upload-title">
+              <li className="upload-title">
+                <div className="file-name">
+                  File
+                </div>
+                <div className="file-progress">
+                  File Progress
+                </div>
+              </li>
+            </ul>
+            <div className="box-list">
+              <ul className="upload-list">
+                <li>
+                  <div className="file-name">
+                    img-0
+                  </div>
+                  <div className="file-progress">
+                    <span className="progress-c">
+                      <span className="progress"></span>
+                    </span>
+                    <span className="status">20%</span>
+                    <a href="javascript:void(0);" className="delete">
+                      <img width="8px" height="8px" src={ close } alt="Delete" />
+                    </a>
+                    <a href="javascript:void(0);" className="retry">Retry</a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div className="upload-meta">
+              <div className="upload-info">
+                <span className="compelete">0 Complete</span>
+                <span className="failed">0 Failed</span>
+              </div>
+              <div className="upload-buttons">
+                <button className="add-more white" onClick={ this.handleAddMore.bind(this) }>Add More Photos</button>
+                <button className="cancel-all black" onClick={ this.handleCancelAll.bind(this) }>Cancel All</button>
+              </div>
+            </div>
+          </div>
+        </XModal>
+    );
+  }
+
+  handleAddMore(e) {
+    //
+  }
+
+  handleCancelAll(e) {
+    //
+  }
+
+  selectFile(){
+
+  }
+}

@@ -1,0 +1,32 @@
+import { template, get } from 'lodash';
+import { CALL_API } from '../middlewares/api';
+import { GET_PROJECT_DATA } from '../contants/apiUrl';
+import { CHANGE_PROJECT_SETTING } from '../contants/actionTypes';
+
+export function getProjectData(userId, projectId) {
+  return (dispatch, getState) => {
+    const baseUrl = get(getState(), 'system.env.urls.baseUrl');
+    return dispatch({
+      [CALL_API]: {
+        apiPattern: {
+          name: GET_PROJECT_DATA,
+          params: { baseUrl, userId, projectId }
+        }
+      }
+    }).then((res) => {
+      const newSetting = get(res, 'imageBox.spec');
+      dispatch({
+        type: CHANGE_PROJECT_SETTING,
+        newSetting
+      });
+    });
+  };
+}
+
+
+export function changeProjectSetting(setting) {
+  return {
+    type: CHANGE_PROJECT_SETTING,
+    setting
+  };
+}

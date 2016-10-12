@@ -1,0 +1,7 @@
+.image-list{
+    width: 382px;
+    height: 750px;
+    // border: 1px solid red;
+    box-sizing: border-box;
+    overflow: auto;
+}

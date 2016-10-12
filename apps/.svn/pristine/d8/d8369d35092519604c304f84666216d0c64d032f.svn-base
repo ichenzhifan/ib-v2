@@ -1,0 +1,18 @@
+locale: "en"
+
+WorkSpace:
+  ADD_TEXT: "Add Text"
+  OUTSIDE: "Outside"
+  INSIDE: "Inside"
+  COUNT: "{{n}} item"
+
+UploadModal:
+  UPLOAD_IMAGES: "Upload Images"
+  COMPLETE_COUNT: "{{n}} Complete"
+  FILED_COUNT: "{{n}} Failed"
+  ADD_MORE_PHOTOS: "Add More Photos"
+  CANCELL_ALL: "Cancel All"
+
+ItemList:
+  FILE: "File"
+  FILE_PROGRESS: "File Progress"

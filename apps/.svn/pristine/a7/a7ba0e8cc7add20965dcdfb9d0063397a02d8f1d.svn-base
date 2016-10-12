@@ -1,0 +1,109 @@
+import { get } from 'lodash';
+import { API_SUCCESS } from '../contants/actionTypes';
+import { LOGIN, GET_SESSION_USER_INFO } from '../contants/apiUrl';
+import  x2jsInstance  from '../../../common/utils/xml2js';
+
+const sKey = 'COOKIES_IN_STORAGE';
+const uKey = 'USERINFO_IN_STORAGE';
+
+/**
+ * 设置cookie
+ * @param data
+ */
+const setCookie = data => {
+  document.cookie = data;
+};
+
+/**
+ * 把cookie数组保存到localstorage
+ * @param data
+ */
+const setToStorage = (key, data) => {
+  localStorage.setItem(key, JSON.stringify(data));
+
+  // 设置cookie
+  // if (data && data.length) {
+  //   setCookie(data[data.length - 1]['Set-Cookie']);
+  // }
+}
+
+/**
+ * 从localstorage中获取上次的cookie
+ * @returns {Array}
+ */
+const getInitCookies = () => {
+  const result = localStorage.getItem(sKey);
+
+  if (result) {
+    let data = JSON.parse(result);
+    setCookie(data[data.length - 1]['Set-Cookie']);
+
+    return data;
+  }
+
+  return [];
+}
+
+/**
+ * 从localstorage中获取上次的cookie
+ * @returns {Array}
+ */
+const getInitUserInfo = () => {
+  const result = localStorage.getItem(uKey);
+
+  return result ? JSON.parse(result) : {};
+}
+
+// 获取cookie的默认值.
+const defaultCookies = getInitCookies();
+const defaultUserInfo = getInitUserInfo();
+
+/**
+ * cookies的reducer, 把新获取的cookie更新到store.
+ * @param state
+ * @param action
+ */
+export const cookies = (state = defaultCookies, action) => {
+  switch (action.type) {
+    case API_SUCCESS:
+      if (action.api.includes(LOGIN)) {
+        const result = JSON.parse(action.response);
+        const myCookies = get(result, 'cookies');
+
+        setToStorage(sKey, myCookies);
+        setCookie(myCookies[myCookies.length - 1]['Set-Cookie']);
+
+        return myCookies || [];
+      }
+      return state;
+    default:
+      return state;
+  }
+};
+
+/**
+ * userInfo的reducer, 把获取到的userInfo更新到store
+ * @param state
+ * @param action
+ */
+export const userInfo = (state = defaultUserInfo, action) => {
+  switch (action.type) {
+    case API_SUCCESS:
+      if (action.api.includes(LOGIN)) {
+        const result = JSON.parse(action.response);
+        const data = get(result, 'userInfo') || {};
+        setToStorage(uKey, data);
+
+        return data;
+      } else if (action.api.includes(GET_SESSION_USER_INFO)) {
+        // todo. 当前的session user info为空.
+        console.log('userinfo:', x2jsInstance.xml2js(action.response));
+        return state;
+      }
+      return state;
+    default:
+      return state;
+  }
+};
+
+

@@ -1,0 +1,46 @@
+import React, { Component, PropTypes } from 'react';
+// import SortAndFilter from '../SortAndFilter';
+import ImageItem from '../ImageItem';
+import XDrag from '../../../../common/ZNOComponents/XDrag';
+import './index.scss';
+
+class ImageList extends Component{
+  constructor(props){
+    super(props)
+  }
+
+  onDragStarted(imageObj,event) {
+    const { encImgId, width, height, imageId } = imageObj;
+    event.dataTransfer.setData("drag",JSON.stringify({encImgId,width,height,imageId}));
+  }
+
+  render(){
+
+    const { uploadedImages, boundUploadedImagesActions } = this.props;
+
+    return(
+      <div className="image-list">
+        {
+          uploadedImages
+          ? uploadedImages.map((imageObj, index) => {
+            return (
+              <div key={index}>
+                <XDrag onDragStarted={ this.onDragStarted.bind(this,imageObj) }>
+                  <ImageItem imageObj={imageObj} boundUploadedImagesActions={ boundUploadedImagesActions }/>
+                </XDrag>
+              </div>
+            )
+          })
+          : null
+        }
+
+      </div>
+    );
+  }
+}
+
+ImageList.propTypes = {
+
+};
+
+export default ImageList;

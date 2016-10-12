@@ -1,0 +1,64 @@
+import React, { Component, PropTypes } from 'react';
+
+import XHeader from '../../../../common/ZNOComponents/XHeader';
+import './index.scss';
+import logo from './new-logo-white.svg';
+
+export default class PageHeader extends Component {
+  constructor(props) {
+    super(props);
+    this.handleDownload = this.handleDownload.bind(this);
+    this.handlePreview = this.handlePreview.bind(this);
+    this.handleSave = this.handleSave.bind(this);
+    this.handleOrder = this.handleOrder.bind(this);
+  }
+
+  render() {
+    const { onLoginHandle } = this.props;
+
+    return (
+      <XHeader
+        showRedirectHomeModal={this.props.showRedirectHomeModal}
+      >
+        <pre className="project-title">this.props.title</pre>
+        <div className="head-nav">
+          <span className="nav-item" onClick={ this.handleDownload }>Box Spec</span>
+          <span className="nav-item" onClick={ this.props.showOptionsModal  }>Options</span>
+          <span className="nav-item" onClick={ this.handlePreview }>Preview</span>
+          <span className="nav-item" onClick={ this.handleSave }>Save</span>
+          <span className="nav-item" onClick={ this.handleOrder }>Order</span>
+          <span className="nav-item" onClick={ onLoginHandle }>Login</span>
+        </div>
+      </XHeader>
+    );
+  }
+
+  handleGoHome(e) {
+    this.props.showRedirectHomeModal();
+    // window.location = '//www.zno.com.dd';
+  }
+
+  handleDownload(e) {
+    window.open("http://www.zno.com.dd/template-resources/h5Client/data/12X12SPEC_IW_T.zip", "_parent")
+  }
+
+  handleSetOption() {
+    alert('handleSetOption');
+  }
+
+  handlePreview() {
+    alert('handlePreview');
+  }
+
+  handleSave() {
+    alert('handleSave');
+  }
+
+  handleOrder() {
+    alert('handleOrder');
+  }
+
+  handleLogin() {
+    alert('handleOrder');
+  }
+}

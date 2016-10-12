@@ -1,0 +1,11 @@
+/**
+ * 处理上传的图片.
+ * @param state
+ * @param action
+ * @returns {*}
+ */
+const uploadedImages = (state = {}, action) => {
+  return state;
+};
+
+export default uploadedImages;

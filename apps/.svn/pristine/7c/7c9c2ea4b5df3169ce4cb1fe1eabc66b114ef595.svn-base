@@ -1,0 +1,291 @@
+import React, { Component, PropTypes } from 'react';
+import { merge, template, isEqual, set } from  'lodash';
+
+
+// 导入用于本地化的组件
+import { translate } from 'react-translate';
+import { elementTypes, spreadTypes } from '../../contants/strings';
+
+import {
+  getBorderLinesXY,
+  getWrapLinesXY,
+  getSpineThicknessLinesXY,
+  getPreviewSpineThicknessLinesXY
+} from '../../../../common/utils/line';
+import { makeId } from '../../../../common/utils/math';
+import { combineImgCopperUrl, loadImg } from '../../../../common/utils/image';
+import classNames from 'classnames';
+import { IMAGES_CROPPER_PARAMS, TEXT_SRC } from '../../contants/apiUrl';
+import { getWrapBoxes } from '../../../../common/utils/draw';
+import XElements from '../../../../common/ZNOComponents/XElements';
+import XBGElement from '../../../../common/ZNOComponents/XBGElement';
+import XPhotoElement from '../../../../common/ZNOComponents/XPhotoElement';
+import XTextElement from '../../../../common/ZNOComponents/XTextElement';
+import XHandler from '../../../../common/ZNOComponents/XHandler';
+import XLines from '../../../../common/ZNOComponents/XLines';
+import XBoxes from '../../../../common/ZNOComponents/XBoxes';
+
+import './index.scss';
+
+class Spread extends Component {
+  constructor(props) {
+    super(props);
+
+    const state = this.initSpread(this.props);
+    this.state = state;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!this.state.liveUpdateCropImageUrl
+      || !isEqual(this.props.textsOptions, nextProps.textsOptions)
+      || !isEqual(this.props.spreadOptions, nextProps.spreadOptions)
+      || !isEqual(this.props.elementsOptions, nextProps.elementsOptions)) {
+      this.setState(this.initSpread(nextProps));
+    }
+  }
+
+  initSpread(props) {
+    const { spreadOptions, elementsOptions, isPreview, textsOptions, imageBaseUrl, baseUrls } = props;
+    const { width, height } = spreadOptions;
+    const _this = this;
+
+    // 获取各种线的坐标.
+    const lineWidth = 1;
+    const borderLines = getBorderLinesXY(width, height, lineWidth, '#bcbcbc', true, 10);
+
+    // 包括包边和出血区域在当前的case中, 因为没有设计出血线.
+    const wrapLines = getWrapLinesXY(width, height, spreadOptions.wrapSize + spreadOptions.bleedTop, lineWidth, '#95989a');
+    const spineThicknessLines = getSpineThicknessLinesXY(width, height, spreadOptions.spineThicknessWidth, lineWidth, '#bcbcbc', true, 12);
+    const previewSpineThicknessLines = getPreviewSpineThicknessLinesXY(spreadOptions.wrapSize + spreadOptions.bleedTop, width, height, spreadOptions.spineThicknessWidth, lineWidth, '#bcbcbc', false);
+
+    // photo元素的options设置
+    const photoElements = [];
+    elementsOptions.forEach((m) => {
+      if (m.type === elementTypes.photo) {
+        photoElements.push(merge({}, m, {
+          lineWidth,
+          imageUrl: imageBaseUrl ? combineImgCopperUrl(imageBaseUrl + IMAGES_CROPPER_PARAMS,
+            m.encImgId || '',
+            m.encImgId ? '' : m.imageid,
+            m.width,
+            m.height,
+            width,
+            height,
+            m.rotation || 0) : ''
+        }, {
+          wrapSize: spreadOptions.wrapSize + spreadOptions.bleedTop,
+          bleedTop: 0,
+          bleedBottom: 0,
+          bleedLeft: 0,
+          bleedRight: 0
+        }));
+      }
+    });
+
+    const textOpt = textsOptions ? merge([], textsOptions) : [];
+    const textOptions = textOpt.map((text, index)=> {
+      const textUrl = template(TEXT_SRC)({
+        fontBaseUrl: baseUrls.productBaseURL,
+        text: encodeURIComponent(text.text),
+        fontSize: encodeURIComponent(text.fontSize),
+        fontColor: encodeURIComponent(text.fontColor),
+        fontFamily: encodeURIComponent(text.fontFamily)
+      });
+      loadImg(textUrl).then((response)=> {
+        const img = response.img;
+        const newState = set(merge([], _this.state), `textOptions.${index}`, {
+          textUrl: textUrl,
+          width: img.width,
+          height: img.height,
+          left: text.left,
+          top: text.top
+        });
+        _this.setState(newState);
+      })
+      return merge({}, text, {
+        textUrl: textUrl,
+        width: 0,
+        height: 0,
+        left: text.left,
+        top: text.top
+      });
+    });
+
+    // 包边区域元素的options设置
+    const boxesOptions = merge({}, spreadOptions, {
+      wrapSize: spreadOptions.wrapSize + spreadOptions.bleedTop,
+      bleedTop: 0,
+      bleedBottom: 0,
+      bleedLeft: 0,
+      bleedRight: 0
+    });
+
+    // 获取上下左右四个包边区域的坐标和宽高信息
+    let boxColor = '';
+    if (isPreview) {
+      boxColor = 'rgba(255, 255, 255, 1)';
+    } else {
+      boxColor = 'rgba(0, 0, 0, 0.05)';
+    }
+    const boxSize = {
+      width,
+      height,
+      color: boxColor,
+      bleedTop: boxesOptions.bleedTop,
+      bleedBottom: boxesOptions.bleedBottom,
+      bleedLeft: boxesOptions.bleedLeft,
+      bleedRight: boxesOptions.bleedRight,
+      wrapSize: boxesOptions.wrapSize,
+      lineWidth
+    };
+
+    // 各种线的信息
+    let lines = (spreadOptions.type === spreadTypes.coverPage)?previewSpineThicknessLines:[];
+    if (!isPreview) {
+      lines = spreadOptions.type === spreadTypes.coverPage ?
+        [...borderLines, ...wrapLines, ...spineThicknessLines]
+        : [...borderLines, ...wrapLines];
+    }
+
+    const state = {
+      lineWidth,
+      borderLines,
+      wrapLines,
+      spineThicknessLines,
+      photoElements,
+      textOptions,
+      boxesOptions,
+      boxSize,
+      lines,
+      previewSpineThicknessLines,
+      liveUpdateCropImageUrl: elementsOptions.url
+    };
+    return state;
+  }
+
+  getPhotoElementHtml() {
+    const { spreadId, spreadOptions } = this.props;
+    const { width, height } = spreadOptions;
+
+    const elements = this.state.photoElements.map((p, i) => {
+      return (
+        <XPhotoElement key={i} canvasId={makeId(spreadId)}
+                       width={p.targetWidth || width}
+                       height={p.targetHeight || height}
+                       options={p}>
+
+          {/* 控制元素, 用于控制渲染出来的图片, 如缩放, 旋转等 */}
+          <XHandler />
+        </XPhotoElement>
+      );
+    });
+
+    return elements;
+  }
+
+  render() {
+    const { className, spreadId, spreadOptions, t } = this.props;
+    const { width, height, bgColor } = spreadOptions;
+
+    const customClass = classNames('spread', className);
+
+    // spread的样式
+    const styles = {
+      width: `${width}px`,
+      height: `${height}px`
+    };
+
+    return (
+      <div className={customClass} style={styles}>
+        <XElements>
+          {/* 背景元素, 设置画布背景 */}
+          <XBGElement canvasId={makeId(spreadId)}
+                      bgColor={bgColor}
+                      width={width}
+                      height={height}
+                      textInCenter={t('CLICK_TO_ADD_PHOTO') || ''}
+          />
+
+          {/* 图片元素, 用于渲染图片 */}
+          { this.getPhotoElementHtml() }
+
+          {/* 文本元素, 用于渲染文本 */}
+          {
+            this.state.textOptions.map((textOption, index)=> {
+              return (
+                <XTextElement canvasId={makeId(spreadId)}
+                              width={textOption.width}
+                              height={textOption.height}
+                              options={textOption}
+                              key={index}>
+
+                  {/* 控制元素, 用于控制渲染出来的图片, 如缩放, 旋转等 */}
+                  <XHandler />
+                </XTextElement>
+              )
+            })
+          }
+
+        </XElements>
+
+        {/* 四个包边区域 */}
+        <XBoxes canvasId={makeId(spreadId)}
+                width={width}
+                height={height}
+                boxSize={this.state.boxSize}
+        />
+
+
+        {/* 线条元素, 用于绘制各种线条 */}
+        <XLines canvasId={makeId(spreadId)}
+                width={width}
+                height={height}
+                lines={this.state.lines}
+        />
+
+      </div>
+    );
+  }
+}
+
+Spread.propTypes = {
+  spreadId: PropTypes.string.isRequired,
+
+  // spread的参数设置
+  spreadOptions: PropTypes.shape({
+    bgColor: PropTypes.string,
+    width: PropTypes.number,
+    height: PropTypes.number,
+    bleedTop: PropTypes.number,
+    bleedBottom: PropTypes.number,
+    bleedLeft: PropTypes.number,
+    bleedRight: PropTypes.number,
+    spineThicknessWidth: PropTypes.number,
+    wrapSize: PropTypes.number,
+  }).isRequired,
+
+  // 在spread上绘制图片的参数设置.
+  elementsOptions: PropTypes.arrayOf(PropTypes.shape({
+    // 图片的原始大小
+    width: PropTypes.number,
+    height: PropTypes.number,
+
+    // 容器的大小
+    targetWidth: PropTypes.number,
+    targetHeight: PropTypes.number,
+
+    // 图片的id
+    encImgId: PropTypes.string,
+    imageId: PropTypes.string
+  })),
+
+  imageBaseUrl: PropTypes.string,
+  onClicked: PropTypes.func,
+  className: PropTypes.string,
+  isPreview: PropTypes.bool
+};
+
+// 要导出的一个translate模块.
+// - 第一个括号里的参数对应的是资源文件中定义的.
+// - 第一个括号里的参数对应的是你要导出的组件名.
+export default translate('Spread')(Spread);

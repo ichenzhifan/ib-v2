@@ -1,0 +1,8 @@
+locale: "zh-cn"
+
+WorkSpace:
+  ADD_TEXT: "添加文本"
+  OUTSIDE: "外侧"
+  INSIDE: "内侧"
+  COUNT: "{{n}}项目"
+

@@ -1,0 +1,26 @@
+.upload-item{
+    .delete,.retry{
+      display: none;
+    }
+    &.progress{
+      .delete{
+        display: inline-block;
+      }
+    }
+    &.done{
+      .delete,.retry{
+        display: none;
+      }
+    }
+    &.fail{
+        .retry{
+          display: inline-block;
+        }
+        .progress-c{
+          display: none;
+        }
+        .status{
+          color: #ff792b;
+        }
+    }
+}

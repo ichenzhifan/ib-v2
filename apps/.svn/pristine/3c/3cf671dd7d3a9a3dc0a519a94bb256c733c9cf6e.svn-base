@@ -1,0 +1,11 @@
+.spread{
+  position: relative;
+
+  .x-photo-element,
+  .x-boxes,
+  .x-lines{
+    position: absolute;
+    top: 0;
+    background: transparent;
+  }
+}

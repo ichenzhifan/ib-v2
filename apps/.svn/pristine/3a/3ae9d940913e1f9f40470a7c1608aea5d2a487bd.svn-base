@@ -1,0 +1,38 @@
+import React, { Component, PropTypes } from 'react';
+import SortAndFilter from '../SortAndFilter';
+import ImageItem from '../ImageItem';
+import './index.scss';
+
+class ImageList extends Component{
+  constructor(props){
+    super(props)
+  }
+
+  render(){
+
+    const { uploadImages } = this.props;
+
+    return(
+      <div className = "image-list">
+        <SortAndFilter></SortAndFilter>
+        {
+          uploadImages
+          ? uploadImages.map((imageObj, index) => {
+            return (
+              <div key={index}>
+                <ImageItem imageObj={imageObj} />
+              </div>
+            )
+          })
+          : null
+        }
+      </div>
+      );
+  }
+}
+
+ImageList.propTypes = {
+
+};
+
+export default ImageList;

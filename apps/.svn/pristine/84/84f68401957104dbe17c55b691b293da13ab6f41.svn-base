@@ -1,0 +1,92 @@
+import React, { Component, PropTypes } from 'react';
+
+import XModal from '../../../../common/ZNOComponents/XModal';
+import XButton from '../../../../common/ZNOComponents/XButton';
+import './index.scss';
+
+class OptionsModal extends Component {
+  constructor(props) {
+    super(props);
+    this.state={
+
+    }
+
+    this.changeTitle = this.changeTitle.bind(this);
+  }
+
+  changeTitle(event) {
+    const { boundProjectActions } = this.props;
+    boundProjectActions.changeProjectSetting({
+      title: event.target.value.trim()
+    });
+  }
+
+  render() {
+    const { optionMap, setting } = this.props;
+    return (
+      <XModal
+        className="options-modal"
+        onClosed={this.props.onClosed}
+        opened={this.props.opened}
+      >
+        <div className="option-modal-name">Options</div>
+        <div className="options-modal-title">
+          <label htmlFor="options-modal-title" >Title:</label>
+          <input
+            type="text"
+            id="options-modal-title"
+            value={setting.title}
+            onChange={this.changeTitle}
+          />
+        </div>
+        <div className="options-modal-panneltype">
+          <label>Panel Type:</label>
+          <div className="select-wrap">
+            <select>
+             {
+                optionMap && optionMap.type
+                ? optionMap.type.map((item, index) => {
+                  return (
+                    <option value={item} key={index}>{ item }</option>
+                  );
+                })
+                : null
+             }
+            </select>
+          </div>
+        </div>
+        <div className="options-modal-size">
+          <label>Size:</label>
+          <div className="select-wrap">
+            <select>
+              {
+                optionMap && optionMap.size
+                ? optionMap.size.map((item, index) => {
+                  return (
+                    <option value={item} key={index}>{ item }</option>
+                  );
+                })
+                : null
+
+              }
+            </select>
+          </div>
+        </div>
+        <div className="options-modal-button">
+          <XButton>Done</XButton>
+        </div>
+      </XModal>
+   );
+  }
+}
+
+OptionsModal.propTypes = {
+  optionMap: PropTypes.object.isRequired,
+  setting: PropTypes.object.isRequired,
+  boundProjectActions: PropTypes.object.isRequired,
+  onClosed: PropTypes.func.isRequired,
+  opened: PropTypes.bool.isRequired
+};
+
+
+export default OptionsModal;

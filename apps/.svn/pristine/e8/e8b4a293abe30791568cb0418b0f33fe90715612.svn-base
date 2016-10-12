@@ -1,0 +1,106 @@
+import { merge, get, set, pick, forEach, isEmpty } from 'lodash';
+import qs from 'qs';
+import { API_SUCCESS, CHANGE_PROJECT_SETTING } from '../contants/actionTypes';
+import { GET_PROJECT_DATA, GET_SPEC_DATA } from '../contants/apiUrl';
+
+import projectParser from '../../../common/utils/projectParser';
+import specParser from '../../../common/utils/specParser';
+
+// 从url附加的参数信息中获取用户project的一些初始属性
+const queryStringObj = qs.parse(window.location.search.substr(1));
+const initialState = {
+  setting: pick(queryStringObj, ['title', 'size', 'product', 'type'])
+};
+
+
+const project = (state = initialState, action) => {
+  switch (action.type) {
+    case API_SUCCESS: {
+      switch (action.apiPattern.name) {
+        case GET_PROJECT_DATA: {
+          const xmlObj = action.response;
+          const projectObj = xmlObj.project;
+
+          return merge({}, state, {
+            __originalData__: projectObj
+          });
+        }
+        case GET_SPEC_DATA: {
+          const specObj = get(action, 'response.product-spec');
+
+          const configurableOptionArray = specParser
+            .prepareConfigurableOptionMap(specObj);
+          const optionGroup = specParser.convertOptionGroupToMap(specObj);
+
+          const setting = projectParser
+            .getDefaultProjectSetting(state.setting, configurableOptionArray);
+
+          const optionMap = projectParser.generateOptionMapByNewSetting(
+            setting, configurableOptionArray, optionGroup
+          );
+
+          return merge({}, state, {
+            configurableOptionArray,
+            setting,
+            optionMap,
+            optionGroup
+          });
+        }
+        default:
+          return state;
+      }
+    }
+    case CHANGE_PROJECT_SETTING: {
+      const newSetting = action.setting;
+      if (!isEmpty(newSetting)) {
+        const shadowAffectedSettingKeys = Object.keys(newSetting);
+        const shadowAffectedConfigurableOptionArray = [];
+        const { configurableOptionArray, optionGroup } = state;
+        if (configurableOptionArray && optionGroup) {
+          configurableOptionArray.forEach((optionMap) => {
+            forEach(shadowAffectedSettingKeys, (settingKey) => {
+              if (optionMap.keyPattern.indexOf(settingKey) !== -1) {
+                shadowAffectedConfigurableOptionArray.push(optionMap);
+                return false;
+              }
+            });
+          });
+
+          const deepAffectedConfigurableOptionArray =
+            shadowAffectedConfigurableOptionArray.concat([]);
+          shadowAffectedConfigurableOptionArray.forEach((optionMap) => {
+            projectParser.getAffectedConfigurableOptionArray(
+              optionMap,
+              configurableOptionArray,
+              deepAffectedConfigurableOptionArray
+            );
+          });
+
+
+          const mergedSetting = merge({}, state.setting, newSetting);
+
+          const setting = projectParser.getProjectSetting(
+            mergedSetting, deepAffectedConfigurableOptionArray
+          );
+
+          const allNewSetting = merge({}, mergedSetting, setting);
+
+          const optionMap = projectParser.generateOptionMapByNewSetting(
+            allNewSetting, configurableOptionArray, optionGroup
+          );
+
+          return set(merge({}, state, {
+            setting: allNewSetting
+          }), 'optionMap', optionMap);
+        }
+
+        return merge({}, state, { setting: newSetting });
+      }
+      return state;
+    }
+    default:
+      return state;
+  }
+};
+
+export default project;

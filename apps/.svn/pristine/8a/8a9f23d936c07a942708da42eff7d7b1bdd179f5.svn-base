@@ -1,0 +1,14 @@
+import { combineReducers } from 'redux';
+
+import alerts from './alertsReducer';
+import env from './envReducer';
+import images from './imagesReducer';
+import price from './priceReducer';
+
+// reducer合成器, 用于分别处理不同的reducer.
+export default combineReducers({
+  alerts,
+  env,
+  images,
+  price
+});

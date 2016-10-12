@@ -1,0 +1,24 @@
+@import "../../../../common/styles/fonts";
+@import "../../../../common/styles/base";
+@import "../../../../common/styles/common";
+
+.app {
+  min-width: 1700px;
+  clear: both;
+
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .side-bar {
+    float: left;
+  }
+
+  .work-space {
+    float: left;
+    margin-left: 100px;
+  }
+}

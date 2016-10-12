@@ -1,0 +1,12 @@
+import { CALL_API } from '../middlewares/api';
+import { GET_SPEC_DATA } from '../contants/apiUrl';
+
+export function getSpecData() {
+  return (dispatch) => {
+    return dispatch({
+      [CALL_API]: {
+        api: GET_SPEC_DATA
+      }
+    });
+  };
+}

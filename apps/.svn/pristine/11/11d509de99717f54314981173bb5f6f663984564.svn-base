@@ -1,0 +1,4 @@
+.side-bar {
+  border-right: 1px solid rgba(232, 232, 232, 1);
+  width: 300px;
+}

@@ -1,0 +1,34 @@
+@import "../../../../common/fonts/fonts";
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  @include font-normal();
+}
+
+.app {
+  padding-top: 50px;
+  min-width: 1000px;
+
+  .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .side-bar {
+    position: absolute;
+    top: 50px;
+    bottom: 0;
+    left: 0;
+  }
+
+  .work-space {
+    margin-left: 300px;
+  }
+}

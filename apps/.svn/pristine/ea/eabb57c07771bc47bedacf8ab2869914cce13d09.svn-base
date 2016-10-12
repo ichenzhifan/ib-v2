@@ -1,0 +1,128 @@
+import React, { Component, PropTypes } from 'react';
+import {merge} from 'lodash';
+import XFileUpload from '../../../../common/ZNOComponents/XFileUpload';
+import XButton from '../../../../common/ZNOComponents/XButton';
+import { translate } from 'react-translate';
+import ListTab from '../ListTab';
+import SortAndFilter from '../SortAndFilter';
+import ImageList from '../ImageList';
+import ImageItem from '../ImageItem';
+import './index.scss';
+
+class SideBar extends Component {
+  constructor(props) {
+    super(props);
+
+    const { imageArray } = this.props;
+
+    this.state = {
+      selectedSize: null,
+      sortBy:'',
+      isChecked : false,
+      imageArray
+    };
+  }
+
+  onToggleHideUsed(isChecked) {
+    const { imageArray } = this.props;
+    this.setState({
+      isChecked: isChecked
+    });
+
+    if (isChecked) {
+      const newImages = this.state.imageArray.filter(item=>{
+        return item.usedCount === 0;
+      });
+      this.setState({
+        imageArray: newImages
+      })
+    }else{
+      this.setState({
+        imageArray: imageArray
+      })
+    }
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(!Object.is(this.state.imageArray, nextProps.imageArray)){
+      const newImages = merge([], nextProps.imageArray);
+        newImages.sort((a, b) => {
+          return a[this.state.sortBy] > b[this.state.sortBy];
+        });
+      if(this.state.isChecked){
+        const nonUsedImages = newImages.filter(item=>{
+          return item.usedCount === 0;
+        });
+        this.setState({
+          imageArray: nonUsedImages
+        })
+      }else{
+        this.setState({
+          imageArray: newImages
+        });
+      }
+    }
+  }
+
+  onSorted(param){
+    const { imageArray } = this.props;
+    console.log('param', param);
+    const {value} = param;
+    this.setState({
+      sortBy: value
+    });
+
+    const newImages = merge([], imageArray);
+    newImages.sort((a, b) => {
+      return a[value] > b[value];
+    });
+
+    if(this.state.isChecked){
+      const nonUsedImages = newImages.filter(item=>{
+        return item.usedCount === 0;
+      });
+      this.setState({
+        imageArray: nonUsedImages
+      })
+    }else{
+      this.setState({
+        imageArray: newImages
+      });
+    }
+  }
+
+  render() {
+    const { hideUsedToggle, optionChange, onSelected,boundUploadedImagesActions, toggleModal, t, baseUrls } = this.props;
+
+    return (
+      <aside className="side-bar">
+
+        <ListTab className="list-tab">
+          { t('IMAGES') }
+        </ListTab>
+
+        <XFileUpload
+          className="add-photo"
+          boundUploadedImagesActions={ boundUploadedImagesActions }
+          toggleModal={ toggleModal }
+          multiple="multiple"
+        >
+          { t('ADD_PHOTO') }
+        </XFileUpload>
+        <SortAndFilter onSorted={this.onSorted.bind(this)}
+                       onToggleHideUsed={this.onToggleHideUsed.bind(this)}
+        />
+        <ImageList
+          uploadedImages={this.state.imageArray}
+          baseUrls={baseUrls}
+          boundUploadedImagesActions={ boundUploadedImagesActions }
+        />
+
+
+      </aside>
+    );
+  }
+}
+
+export default translate('SideBar')(SideBar);
+

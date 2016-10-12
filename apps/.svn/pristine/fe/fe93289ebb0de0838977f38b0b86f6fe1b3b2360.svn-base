@@ -1,0 +1,97 @@
+import React, { Component } from 'react';
+import {merge} from 'lodash';
+import { translate } from "react-translate";
+import XAddText from '../../../../common/ZNOComponents/XAddText';
+import XDrop from '../../../../common/ZNOComponents/XDrop';
+import Spread from '../Spread';
+import OutInSide from '../OutInSide';
+import './index.scss';
+
+class WorkSpace extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  onAddText() {
+    alert('add text');
+  }
+
+  onOutside() {
+    alert('click on outside');
+  }
+
+  onInside() {
+    alert('click on inside');
+  }
+
+  onSpreadClick() {
+    alert('click on spread');
+  }
+
+  onSpreadDroped(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    const data = JSON.parse(event.dataTransfer.getData('drag'));
+    console.log(data);
+    event.dataTransfer.clearData();
+  }
+
+  render() {
+    // t方法是用于本地化, 通过传入的key, 来获取对应的value.
+    const { children, t } = this.props;
+
+    const spreadOptions = {
+      textInCenter: t('CLICK_TO_ADD_PHOTO'),
+      bgColor: '#f6f6f6',
+      width: 9165.354330708662,
+      height: 3673.228346456693,
+      bleedTop: 35.43307086614173,
+      bleedBottom: 35.43307086614173,
+      bleedLeft: 35.43307086614173,
+      bleedRight: 35.43307086614173,
+      spineThicknessWidth: 826.7716535433071,
+      wrapSize: 330.7086614173228
+    };
+    const rate = 1200 / spreadOptions.width;
+
+    const opt = merge({}, spreadOptions, {
+      width: spreadOptions.width * rate,
+      height: spreadOptions.height * rate,
+      bleedTop: spreadOptions.bleedTop * rate,
+      bleedBottom: spreadOptions.bleedBottom * rate,
+      bleedLeft: spreadOptions.bleedLeft * rate,
+      bleedRight: spreadOptions.bleedRight * rate,
+      spineThicknessWidth: spreadOptions.spineThicknessWidth * rate,
+      wrapSize: spreadOptions.wrapSize * rate
+    });
+
+    return (
+      <section className="work-space">
+        {children}
+        <div className="btn-list">
+          {/* add text 按钮 */}
+          <XAddText text={t('ADD_TEXT')} onClicked={this.onAddText.bind(this)}/>
+        </div>
+        <div className="image-editor">
+          <XDrop onDroped={ this.onSpreadDroped.bind(this) }>
+            <Spread spreadId="UNIQUE-0"
+                    onClicked={this.onSpreadClick.bind(this)}
+                    options={opt} />
+          </XDrop>
+        </div>
+        <div className="btn-list m-b-66">
+          <OutInSide leftText={t('OUTSIDE')}
+                     rightText={t('INSIDE')}
+                     onLeftClicked={this.onOutside.bind(this)}
+                     onRightClicked={this.onInside.bind(this)}
+                     />
+        </div>
+      </section>
+    );
+  }
+}
+
+// 要导出的一个translate模块.
+// - 第一个括号里的参数对应的是资源文件中定义的.
+// - 第一个括号里的参数对应的是你要导出的组件名.
+export default translate('WorkSpace')(WorkSpace);

@@ -1,0 +1,54 @@
+@mixin modal-box-shadow(){
+  box-shadow: 0 5px 15px rgba(0,0,0,.5);
+}
+
+.x-modal {
+  display: none;
+
+  &.show{
+    display: block;
+  }
+
+  .backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 10;
+  }
+
+  .content {
+    @include modal-box-shadow();
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    //width: 610px;
+    min-width:200px;
+    min-height: 200px;
+    background: #fff;
+    z-index: 11;
+
+    // 关闭按钮
+    .icon-close{
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      width: 16px;
+      height: 16px;
+      z-index: 12;
+      background: url("close.png");
+      cursor: pointer;
+    }
+
+    &.lg {
+      width: 900px;
+    }
+
+    &.sm {
+      width: 300px;
+    }
+  }
+}

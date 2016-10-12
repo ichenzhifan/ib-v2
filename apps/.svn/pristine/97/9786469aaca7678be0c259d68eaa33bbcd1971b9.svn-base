@@ -1,0 +1,55 @@
+import React, { Component, PropTypes } from 'react';
+import XFileUpload from '../../../../common/ZNOComponents/XFileUpload';
+import XButton from '../../../../common/ZNOComponents/XButton';
+import { translate } from 'react-translate';
+import ListTab from '../ListTab';
+import SortAndFilter from '../SortAndFilter';
+import ImageList from '../ImageList';
+import ImageItem from '../ImageItem';
+import './index.scss';
+
+class SideBar extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedSize: null,
+    };
+
+  }
+
+  render() {
+    const { hideUsedToggle, optionChange, onSelected,boundUploadedImagesActions, toggleModal, t ,uploadedImages} = this.props;
+
+    return (
+      <aside className="side-bar">
+
+        <ListTab className="list-tab">images</ListTab>
+
+        <XFileUpload
+          className="add-photo"
+          boundUploadedImagesActions={ boundUploadedImagesActions }
+          toggleModal={ toggleModal }
+          multiple="multiple"
+        >
+          Add Photo
+        </XFileUpload>
+        <SortAndFilter
+          uploadedImages={uploadedImages}
+          boundUploadedImagesActions={ boundUploadedImagesActions }
+        />
+        <ImageList
+          uploadedImages={uploadedImages}
+          boundUploadedImagesActions={ boundUploadedImagesActions }
+        />
+
+
+      </aside>
+    );
+  }
+}
+SideBar.propTypes = {
+
+}
+export default SideBar;
+

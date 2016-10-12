@@ -1,0 +1,27 @@
+import { SHOW_CONFIRM, HIDE_CONFIRM, SHOW_NOTIFY, HIDE_NOTIFY } from '../contants/actionTypes';
+
+export function showConfirm(confirmData) {
+  return {
+    type: SHOW_CONFIRM,
+    confirmData
+  };
+}
+
+export function hideConfirm() {
+  return {
+    type: HIDE_CONFIRM
+  };
+}
+
+export function showNotify(notifyMessage) {
+  return {
+    type: SHOW_NOTIFY,
+    notifyMessage
+  };
+}
+
+export function hideNotify() {
+  return {
+    type: HIDE_NOTIFY
+  };
+}
